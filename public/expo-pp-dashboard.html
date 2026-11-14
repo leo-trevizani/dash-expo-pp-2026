@@ -8,6 +8,7 @@
       name="description"
       content="Dashboard de resultados e destaques comportamentais da Expo PP para os alunos participantes."
     />
+    <link rel="icon" type="image/png" href="./assets/aistudio/image_f7f0da98.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -170,7 +171,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
+        gap: 12px;
         height: 64px;
         padding: 0 16px;
         border-bottom: 1px solid var(--expo-hairline);
@@ -180,6 +181,7 @@
 
       @media (min-width: 640px) {
         .topbar {
+          gap: 16px;
           padding: 0 24px;
         }
       }
@@ -187,8 +189,16 @@
       .logo-link {
         display: inline-flex;
         align-items: center;
+        gap: 8px;
         flex-shrink: 0;
         border-radius: 8px;
+        text-decoration: none;
+      }
+
+      @media (min-width: 640px) {
+        .logo-link {
+          gap: 10px;
+        }
       }
 
       .logo-link:focus-visible {
@@ -197,31 +207,75 @@
       }
 
       .logo-img {
-        height: 32px;
+        height: 24px;
         width: auto;
         object-fit: contain;
         display: block;
       }
 
+      @media (min-width: 640px) {
+        .logo-img {
+          height: 32px;
+        }
+      }
+
+      .logo-divider {
+        width: 1px;
+        height: 16px;
+        background-color: var(--expo-hairline);
+      }
+
+      @media (min-width: 640px) {
+        .logo-divider {
+          height: 20px;
+        }
+      }
+
+      .logo-year {
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        color: var(--expo-text-secondary);
+      }
+
+      @media (min-width: 640px) {
+        .logo-year {
+          font-size: 20px;
+        }
+      }
+
       .cta-form-btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        height: 40px;
-        padding: 0 16px;
+        gap: 6px;
+        height: 36px;
+        padding: 0 12px;
         flex-shrink: 0;
         border-radius: 12px;
         background-color: var(--expo-primary);
         color: #0F0A1F;
         text-decoration: none;
         font-family: "Space Grotesk", system-ui, sans-serif;
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 700;
-        letter-spacing: 1.1px;
+        letter-spacing: 0.9px;
         text-transform: uppercase;
         white-space: nowrap;
         box-shadow: var(--expo-shadow-md);
         transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @media (min-width: 640px) {
+        .cta-form-btn {
+          gap: 8px;
+          height: 40px;
+          padding: 0 16px;
+          font-size: 13px;
+          letter-spacing: 1.1px;
+        }
       }
 
       .cta-form-btn:hover {
@@ -1069,8 +1123,10 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <a href="#visao-geral" class="logo-link">
-          <img src="/assets/aistudio/image_f7f0da98.png" alt="Expo PP" class="logo-img" />
+        <a href="#visao-geral" class="logo-link" aria-label="Expo PP 2026">
+          <img src="./assets/aistudio/image_f7f0da98.png" alt="Expo PP" class="logo-img" />
+          <span class="logo-divider" aria-hidden="true"></span>
+          <span class="logo-year">2026</span>
         </a>
 
         <a

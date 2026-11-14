@@ -48,23 +48,31 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-[#0F0A1F] text-white">
       {/* Full-Width Top Navigation Bar */}
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-[#251F35] bg-[#0F0A1F]/95 px-4 backdrop-blur-md sm:px-6">
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-[#251F35] bg-[#0F0A1F]/95 px-4 backdrop-blur-md sm:gap-4 sm:px-6">
         <a
           href="#visao-geral"
-          className="inline-flex shrink-0 items-center rounded-[8px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F27D26]"
+          aria-label="Expo PP 2026"
+          className="inline-flex shrink-0 items-center gap-2 rounded-[8px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F27D26] sm:gap-2.5"
         >
           <img
-            src="/assets/aistudio/image_f7f0da98.png"
+            src="./assets/aistudio/image_f7f0da98.png"
             alt="Expo PP"
-            className="h-8 w-auto object-contain"
+            className="h-6 w-auto object-contain sm:h-8"
           />
+          <span
+            className="h-4 w-px bg-[#251F35] sm:h-5"
+            aria-hidden="true"
+          />
+          <span className="font-display text-[15px] font-bold leading-none tracking-[-0.02em] text-[#D4CEE3] tabular-nums sm:text-[20px]">
+            2026
+          </span>
         </a>
 
         <a
           href={POST_EVENT_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-display inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-[12px] bg-[#F27D26] px-4 text-[13px] font-bold uppercase tracking-[1.1px] text-[#0F0A1F] shadow-[0_10px_15px_-3px_oklab(0.710617_0.106104_0.132957/0.2),0_4px_6px_-4px_oklab(0.710617_0.106104_0.132957/0.2)] transition-colors duration-150 hover:bg-[#FF9142] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]"
+          className="font-display inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[12px] bg-[#F27D26] px-3 text-[11px] font-bold uppercase tracking-[0.9px] text-[#0F0A1F] shadow-[0_10px_15px_-3px_oklab(0.710617_0.106104_0.132957/0.2),0_4px_6px_-4px_oklab(0.710617_0.106104_0.132957/0.2)] transition-colors duration-150 hover:bg-[#FF9142] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] sm:h-10 sm:gap-2 sm:px-4 sm:text-[13px] sm:tracking-[1.1px]"
         >
           <span>Formulário Pós-Evento</span>
           <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
