@@ -1,0 +1,1750 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expo PP — Dashboard de Resultados</title>
+    <meta
+      name="description"
+      content="Dashboard de resultados e destaques comportamentais da Expo PP para os alunos participantes."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --expo-canvas: #0F0A1F;
+        --expo-sidebar: #130E26;
+        --expo-surface: #161126;
+        --expo-surface-raised: #221E30;
+        --expo-primary: #F27D26;
+        --expo-purple: #7C3AED;
+        --expo-hairline: #251F35;
+        --expo-text: #FFFFFF;
+        --expo-text-secondary: #D4CEE3;
+        --expo-text-muted: #9B93B2;
+        --expo-shadow-sm: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+        --expo-shadow-md: oklab(0.710617 0.106104 0.132957 / 0.2) 0px 10px 15px -3px, oklab(0.710617 0.106104 0.132957 / 0.2) 0px 4px 6px -4px;
+        --expo-shadow-lg: oklab(0.710617 0.106104 0.132957 / 0.1) 0px 20px 25px -5px, oklab(0.710617 0.106104 0.132957 / 0.1) 0px 8px 10px -6px;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        background-color: var(--expo-canvas);
+        color: var(--expo-text);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background-color: var(--expo-canvas);
+        color: var(--expo-text);
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      ::selection {
+        background: rgba(242, 125, 38, 0.3);
+        color: #FFFFFF;
+      }
+
+      /* Shell */
+      .app-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .body-layout {
+        display: flex;
+        flex: 1;
+      }
+
+      .sidebar {
+        display: none;
+        width: 248px;
+        flex-shrink: 0;
+        flex-direction: column;
+        justify-content: space-between;
+        border-right: 1px solid var(--expo-hairline);
+        background-color: var(--expo-sidebar);
+        position: sticky;
+        top: 64px;
+        height: calc(100vh - 64px);
+      }
+
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: flex;
+        }
+      }
+
+      .brand-text {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #FFFFFF;
+      }
+
+      .sidebar-nav-wrap {
+        padding: 20px 12px;
+      }
+
+      .sidebar-kicker {
+        margin: 0 0 10px;
+        padding: 0 10px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--expo-text-muted);
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        color: #C4BBD9;
+        white-space: nowrap;
+        transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1), color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .sidebar-link:hover,
+      .sidebar-link:focus-visible {
+        background-color: #1B1530;
+        color: #FFFFFF;
+        outline: none;
+      }
+
+      .sidebar-link[data-active="true"] {
+        background-color: var(--expo-surface-raised);
+        border-color: var(--expo-hairline);
+        color: #FFFFFF;
+      }
+
+      .sidebar-link[data-active="true"] svg {
+        color: var(--expo-primary);
+      }
+
+      .sidebar-footer {
+        border-top: 1px solid var(--expo-hairline);
+        padding: 20px;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .workspace {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+        flex-direction: column;
+      }
+
+      /* Top Header */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        height: 64px;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--expo-hairline);
+        background: rgba(15, 10, 31, 0.95);
+        backdrop-filter: blur(12px);
+      }
+
+      @media (min-width: 640px) {
+        .topbar {
+          padding: 0 24px;
+        }
+      }
+
+      .logo-link {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        border-radius: 8px;
+      }
+
+      .logo-link:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--expo-primary);
+      }
+
+      .logo-img {
+        height: 32px;
+        width: auto;
+        object-fit: contain;
+        display: block;
+      }
+
+      .cta-form-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 16px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background-color: var(--expo-primary);
+        color: #0F0A1F;
+        text-decoration: none;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.1px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        box-shadow: var(--expo-shadow-md);
+        transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .cta-form-btn:hover {
+        background-color: #FF9142;
+      }
+
+      .cta-form-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px #FFFFFF;
+      }
+
+      /* Main Canvas */
+      .canvas {
+        flex: 1;
+        padding: 20px 16px;
+      }
+
+      @media (min-width: 640px) {
+        .canvas {
+          padding: 24px;
+        }
+      }
+
+      .canvas-inner {
+        width: 100%;
+        max-width: 1320px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .banner {
+        scroll-margin-top: 80px;
+        border-radius: 16px;
+        border: 1px solid var(--expo-hairline);
+        padding: 20px;
+        background:
+          radial-gradient(50% 90% at 8% 0%, oklab(0.710617 0.106104 0.132957 / 0.14) 0%, transparent 70%),
+          radial-gradient(45% 80% at 92% 10%, rgba(124, 58, 237, 0.16) 0%, transparent 70%),
+          linear-gradient(
+            to right,
+            oklab(0.381 0.100917 -0.144194 / 0.25) 0%,
+            rgba(22, 18, 33, 0.75) 55%,
+            oklab(0.266 0.0637018 0.0467235 / 0.22) 100%
+          );
+      }
+
+      @media (min-width: 640px) {
+        .banner {
+          padding: 20px 24px;
+        }
+      }
+
+      .banner-row {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      @media (min-width: 1024px) {
+        .banner-row {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+
+      .kicker {
+        margin: 0;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--expo-primary);
+      }
+
+      .banner-title {
+        margin: 6px 0 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+        text-wrap: balance;
+        color: #FFFFFF;
+      }
+
+      @media (min-width: 640px) {
+        .banner-title {
+          font-size: 34px;
+        }
+      }
+
+      .gradient-word {
+        background: linear-gradient(
+          to right,
+          rgb(255, 255, 255) 0%,
+          oklch(0.968 0.007 247.896) 50%,
+          rgb(242, 125, 38) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .banner-sub {
+        margin: 6px 0 0;
+        max-width: 672px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--expo-text-secondary);
+      }
+
+      .banner-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        border-top: 1px solid var(--expo-hairline);
+        padding-top: 12px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 12px;
+        color: var(--expo-text-muted);
+      }
+
+      @media (min-width: 1024px) {
+        .banner-meta {
+          border-top: none;
+          border-left: 1px solid var(--expo-hairline);
+          padding-top: 0;
+          padding-left: 24px;
+          flex-direction: column;
+          align-items: flex-end;
+          flex-shrink: 0;
+        }
+      }
+
+      .banner-meta strong {
+        color: #FFFFFF;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .banner-dot {
+        display: inline;
+      }
+
+      @media (min-width: 1024px) {
+        .banner-dot {
+          display: none;
+        }
+      }
+
+      /* Section Heads */
+      .section-anchor {
+        scroll-margin-top: 80px;
+      }
+
+      .section-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .section-head-tight {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: #FFFFFF;
+      }
+
+      .section-hint {
+        font-size: 12px;
+        color: var(--expo-text-muted);
+      }
+
+      /* Grids */
+      .grid-kpi {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 768px) {
+        .grid-kpi {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      .bento-12 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      @media (min-width: 1280px) {
+        .bento-12 {
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+        }
+      }
+
+      .bento-left {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .bento-right {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      @media (min-width: 1280px) {
+        .bento-left {
+          grid-column: span 8 / span 8;
+        }
+        .bento-right {
+          grid-column: span 4 / span 4;
+        }
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 640px) {
+        .grid-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 640px) {
+        .grid-3 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .grid-patterns {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 768px) {
+        .grid-patterns {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 1280px) {
+        .grid-patterns {
+          grid-template-columns: 1fr;
+          flex: 1;
+        }
+      }
+
+      /* Cards */
+      .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 18px 20px;
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(34, 30, 48, 0.52) 0%, rgba(15, 10, 30, 0.92) 100%);
+        border: 1px solid var(--expo-hairline);
+        box-shadow: var(--expo-shadow-sm);
+        transition:
+          transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .card-kpi {
+        border-radius: 16px;
+        padding: 20px;
+      }
+
+      .card:hover,
+      .card:focus-within {
+        z-index: 20;
+        transform: translateY(-2px);
+        border-color: rgba(242, 125, 38, 0.44);
+        box-shadow: var(--expo-shadow-md), 0 0 0 1px rgba(124, 58, 237, 0.25);
+      }
+
+      .card-purple:hover,
+      .card-purple:focus-within {
+        border-color: rgba(124, 58, 237, 0.48);
+        box-shadow: var(--expo-shadow-lg), 0 0 0 1px rgba(242, 125, 38, 0.22);
+      }
+
+      .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .card-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .icon-box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        border: 1px solid var(--expo-hairline);
+        background-color: var(--expo-canvas);
+        color: var(--expo-primary);
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.38;
+        color: #E7E2F3;
+      }
+
+      .card-value-row {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 10px;
+      }
+
+      .card-value-col {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .card-value {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+        color: #FFFFFF;
+      }
+
+      .card-value-kpi {
+        font-size: 34px;
+        line-height: 1.02;
+      }
+
+      @media (min-width: 1280px) {
+        .card-value-kpi {
+          font-size: 38px;
+        }
+      }
+
+      .card-value-tile {
+        font-size: 24px;
+        line-height: 1.1;
+      }
+
+      @media (min-width: 640px) {
+        .card-value-tile {
+          font-size: 26px;
+        }
+      }
+
+      .card-unit {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--expo-primary);
+      }
+
+      .card-sub {
+        margin: 12px 0 0;
+        padding-top: 10px;
+        border-top: 1px solid var(--expo-hairline);
+        font-size: 12px;
+        line-height: 1.45;
+        color: var(--expo-text-muted);
+      }
+
+      /* Horizontal Bar Chart */
+      .bar-list {
+        list-style: none;
+        margin: 14px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .bar-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 4px;
+        font-size: 12px;
+      }
+
+      .bar-label-wrap {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .bar-rank {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10px;
+        font-variant-numeric: tabular-nums;
+        color: var(--expo-text-muted);
+      }
+
+      .bar-rank-leader {
+        font-weight: 700;
+        color: var(--expo-primary);
+      }
+
+      .bar-agency {
+        font-weight: 500;
+        color: var(--expo-text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .bar-agency-leader {
+        font-weight: 700;
+        color: #FFFFFF;
+      }
+
+      .bar-val-wrap {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        flex-shrink: 0;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .bar-val {
+        font-size: 12px;
+        font-weight: 700;
+        color: #FFFFFF;
+      }
+
+      .bar-val-leader {
+        color: var(--expo-primary);
+      }
+
+      .bar-detail {
+        font-size: 10px;
+        color: var(--expo-text-muted);
+      }
+
+      .bar-track {
+        height: 8px;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 4px;
+        border: 1px solid var(--expo-hairline);
+        background-color: var(--expo-canvas);
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: 3px;
+      }
+
+      /* Line Chart */
+      .line-chart-wrap {
+        margin-top: 12px;
+      }
+
+      .line-readout {
+        margin-bottom: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border-radius: 6px;
+        border: 1px solid var(--expo-hairline);
+        background-color: rgba(15, 10, 31, 0.8);
+        padding: 6px 10px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .line-readout-range {
+        font-weight: 700;
+        color: var(--expo-text-secondary);
+      }
+
+      .line-readout-peak {
+        margin-left: 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--expo-primary);
+      }
+
+      .line-readout-count {
+        font-weight: 700;
+        color: var(--expo-primary);
+      }
+
+      .line-svg {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        display: block;
+        user-select: none;
+      }
+
+      .line-hit {
+        cursor: pointer;
+      }
+
+      .line-hit:focus {
+        outline: none;
+      }
+
+      /* Tooltip */
+      .tooltip-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .tooltip-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin: -8px;
+        padding: 0;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--expo-text-muted);
+        cursor: pointer;
+        transition: color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .tooltip-btn:hover,
+      .tooltip-btn:focus-visible {
+        color: var(--expo-primary);
+        outline: none;
+      }
+
+      .tooltip-btn:focus-visible {
+        box-shadow: 0 0 0 2px var(--expo-primary);
+      }
+
+      .tooltip-popover {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 30;
+        width: 256px;
+        max-width: calc(100vw - 3rem);
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(242, 125, 38, 0.4);
+        background-color: #17112B;
+        color: #D4CEE3;
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: left;
+        box-shadow: 0 14px 28px -6px rgba(0, 0, 0, 0.6), 0 10px 15px -3px oklab(0.710617 0.106104 0.132957 / 0.18);
+        display: none;
+      }
+
+      .tooltip-popover[data-open="true"] {
+        display: block;
+      }
+
+      .tooltip-kicker {
+        margin: 0 0 4px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--expo-primary);
+      }
+
+      .tooltip-body {
+        margin: 0;
+      }
+
+      /* Timeline */
+      .timeline-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .timeline-desktop-wrap {
+        position: relative;
+        display: none;
+      }
+
+      .timeline-track {
+        pointer-events: none;
+        position: absolute;
+        left: 16.67%;
+        right: 16.67%;
+        top: 18px;
+        height: 6px;
+        border-radius: 8px;
+        background-color: var(--expo-hairline);
+      }
+
+      .timeline-fill {
+        height: 100%;
+        width: 100%;
+        border-radius: 8px;
+        background: linear-gradient(to right top in oklab, rgb(242, 125, 38) 0%, rgb(124, 58, 237) 100%);
+      }
+
+      .timeline-grid {
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .timeline-node-btn {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 8px 8px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        cursor: pointer;
+        transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .timeline-node-btn:hover {
+        background-color: rgba(27, 21, 48, 0.6);
+      }
+
+      .timeline-node-btn[aria-pressed="true"] {
+        background-color: rgba(34, 30, 48, 0.75);
+      }
+
+      .timeline-node-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--expo-primary);
+      }
+
+      .timeline-dot {
+        position: relative;
+        z-index: 10;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin-bottom: 12px;
+        border-radius: 9999px;
+        border: 2px solid #0F0A1F;
+        background-color: var(--expo-primary);
+        transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .timeline-node-btn:hover .timeline-dot {
+        transform: scale(1.1);
+      }
+
+      .timeline-node-btn[aria-pressed="true"] .timeline-dot {
+        transform: scale(1.1);
+        border-color: #FFFFFF;
+        box-shadow: 0 0 0 4px rgba(242, 125, 38, 0.22);
+      }
+
+      .timeline-mobile {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .timeline-mobile-btn {
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--expo-hairline);
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .timeline-mobile-btn[aria-pressed="true"] {
+        border-color: rgba(242, 125, 38, 0.5);
+        background-color: rgba(34, 30, 48, 0.75);
+      }
+
+      @media (min-width: 768px) {
+        .timeline-desktop-wrap {
+          display: block;
+        }
+        .timeline-mobile {
+          display: none;
+        }
+      }
+
+      .timeline-note {
+        margin: 12px 0 0;
+        padding-top: 10px;
+        border-top: 1px solid var(--expo-hairline);
+        font-size: 12px;
+        color: var(--expo-text-secondary);
+      }
+
+      .card-selected {
+        border-color: rgba(242, 125, 38, 0.65) !important;
+        box-shadow: 0 0 0 1px rgba(242, 125, 38, 0.4), var(--expo-shadow-md) !important;
+      }
+
+      .timeline-time {
+        margin: 0;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.6px;
+        color: var(--expo-primary);
+      }
+
+      .timeline-label {
+        margin: 2px 0 0;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: #FFFFFF;
+      }
+
+      .timeline-sub {
+        margin: 2px 0 0;
+        font-size: 11px;
+        line-height: 1.35;
+        color: var(--expo-text-muted);
+      }
+
+      /* Footer */
+      .footer {
+        border-top: 1px solid var(--expo-hairline);
+        background-color: var(--expo-canvas);
+        padding: 16px;
+      }
+
+      @media (min-width: 640px) {
+        .footer {
+          padding: 16px 24px;
+        }
+      }
+
+      .footer-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--expo-text-muted);
+      }
+
+      @media (min-width: 640px) {
+        .footer-inner {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+
+      .footer-privacy {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--expo-text-secondary);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .card {
+          transition: none;
+        }
+        .card:hover,
+        .card:focus-within {
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a href="#visao-geral" class="logo-link">
+          <img src="/assets/aistudio/image_f7f0da98.png" alt="Expo PP" class="logo-img" />
+        </a>
+
+        <a
+          href="https://forms.gle/UCGH6Pug6AW7fHS66"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="cta-form-btn"
+        >
+          <span>Formulário Pós-Evento</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          </svg>
+        </a>
+      </header>
+
+      <div class="body-layout">
+        <aside class="sidebar" aria-label="Navegação do painel">
+          <div class="sidebar-nav-wrap">
+            <p class="sidebar-kicker">Painel do Evento</p>
+            <nav class="sidebar-nav">
+              <a href="#visao-geral" class="sidebar-link" data-nav="visao-geral" data-active="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                <span>Visão Geral</span>
+              </a>
+              <a href="#big-numbers" class="sidebar-link" data-nav="big-numbers" data-active="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                <span>Big Numbers</span>
+              </a>
+              <a href="#numeros-divertidos" class="sidebar-link" data-nav="numeros-divertidos" data-active="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Números Divertidos</span>
+              </a>
+              <a href="#padroes" class="sidebar-link" data-nav="padroes" data-active="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Padrões dos Participantes</span>
+              </a>
+            </nav>
+          </div>
+
+          <div class="sidebar-footer">
+            <p class="kicker" style="font-size:10px;">Resumo da Janela</p>
+            <p class="timeline-time" style="color:#D4CEE3;font-weight:400;margin-top:6px;">18h26 — 21h29</p>
+            <p style="margin:12px 0 0;font-size:11px;line-height:1.45;color:#9B93B2;">
+              Leitura guiada sem rankings financeiros ou comparativos entre agências.
+            </p>
+          </div>
+        </aside>
+
+        <div class="workspace">
+
+        <main class="canvas">
+          <div class="canvas-inner">
+            <section id="visao-geral" class="banner">
+              <div class="banner-row">
+                <div>
+                  <p class="kicker">Resultados Oficiais · Evento de Publicidade</p>
+                  <h1 class="banner-title">
+                    Dashboard de Resultados <span class="gradient-word">Expo PP</span>
+                  </h1>
+                </div>
+
+                <div class="banner-meta">
+                  <strong>161 participantes únicos</strong>
+                  <span class="banner-dot" aria-hidden="true">·</span>
+                  <strong>127.980 créditos circulados</strong>
+                  <span class="banner-dot" aria-hidden="true">·</span>
+                  <span>Janela oficial até 21h30</span>
+                </div>
+              </div>
+            </section>
+
+            <section id="big-numbers" class="section-anchor" aria-label="Big Numbers">
+              <div id="grid-big-numbers" class="grid-kpi"></div>
+            </section>
+
+            <div class="bento-12">
+              <section id="numeros-divertidos" class="section-anchor bento-left" aria-label="Números Divertidos">
+                <div id="timeline-card" class="card card-kpi" aria-label="Linha do tempo cronológica dos principais marcos do evento"></div>
+                <div id="grid-fun-top" class="grid-2"></div>
+                <div id="grid-fun-bottom" class="grid-3"></div>
+              </section>
+
+              <section id="padroes" class="section-anchor bento-right" aria-label="Padrões dos Participantes">
+                <div id="grid-patterns" class="grid-patterns"></div>
+              </section>
+            </div>
+          </div>
+        </main>
+
+          <footer class="footer">
+            <div class="footer-inner">
+              <div class="footer-privacy">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F27D26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+                <span>Regra de sigilo ativa: nenhum ranking financeiro ou comparativo de arrecadação entre agências é exibido.</span>
+              </div>
+              <span class="brand-text" style="color: #9B93B2; font-size: 11px;">Expo PP · Leitura Guiada</span>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const ICONS = {
+          coins: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
+          users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+          activity: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+          flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+          timer: '<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>',
+          sunrise: '<path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/>',
+          moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+          clockAlert: '<path d="M12 6v6l4 2"/><path d="M16 21.16a10 10 0 1 1 5-13.516"/><path d="M20 11.5v6"/><path d="M20 21.5h.01"/>',
+          heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+          sparkles: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+          gem: '<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+          arrowLeftRight: '<path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>',
+          receipt: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>',
+          wallet: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+          trendingUp: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+          award: '<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>'
+        };
+
+        const BIG_NUMBERS = [
+          {
+            id: 'total-credits',
+            title: 'Total de créditos circulados',
+            value: '127.980',
+            unit: 'créditos',
+            subtitle: 'Volume total movimentado dentro da janela oficial até 21h30',
+            tooltip: 'Soma global dos créditos transferidos nas 269 operações válidas até as 21h30, sem detalhamento ou ranking por agência.',
+            icon: 'coins',
+            tone: 'orange',
+            variant: 'kpi'
+          },
+          {
+            id: 'unique-participants',
+            title: 'Total de participantes',
+            value: '161',
+            unit: 'CPFs únicos',
+            subtitle: 'Pessoas distintas com transações válidas até 21h30',
+            tooltip: 'Contagem de CPFs únicos que efetuaram pelo menos uma transferência de créditos dentro do horário oficial.',
+            icon: 'users',
+            tone: 'purple',
+            variant: 'kpi'
+          },
+          {
+            id: 'tx-per-minute',
+            title: 'Média de transações por minuto',
+            value: '1,47',
+            unit: 'tx / min',
+            subtitle: 'Ritmo médio entre 18h26 e 21h29 (183 min)',
+            tooltip: 'Razão entre as 269 transações válidas e os 183,1 minutos corridos da primeira (18h26) à última operação válida (21h29).',
+            icon: 'activity',
+            tone: 'orange',
+            variant: 'kpi'
+          },
+          {
+            id: 'total-transactions',
+            title: 'Total de Transações',
+            value: '269',
+            unit: 'operações',
+            subtitle: 'Total de transferências válidas registradas até 21h30',
+            tooltip: 'Quantidade total de operações confirmadas dentro do horário oficial do evento (excluindo 2 registros após 21h30).',
+            icon: 'arrowLeftRight',
+            tone: 'purple',
+            variant: 'kpi'
+          },
+          {
+            id: 'avg-ticket',
+            title: 'Ticket Médio por Transação',
+            value: '475,76',
+            unit: 'créditos',
+            subtitle: 'Valor médio movimentado em cada transferência válida',
+            tooltip: 'Média calculada dividindo o total de créditos circulados (127.980) pelas 269 operações válidas registradas.',
+            icon: 'receipt',
+            tone: 'orange',
+            variant: 'kpi'
+          },
+          {
+            id: 'avg-spend-visitor',
+            title: 'Gasto Médio por Visitante',
+            value: '794,91',
+            unit: 'créditos',
+            subtitle: 'Cerca de 1,67 transações por pessoa',
+            tooltip: 'Média de créditos investidos por CPF único participante dentro da janela oficial (127.980 créditos entre 161 pessoas, ~1,67 tx/pessoa).',
+            icon: 'wallet',
+            tone: 'purple',
+            variant: 'kpi'
+          }
+        ];
+
+        const FUN_TOP = [
+          {
+            id: 'rush-hour',
+            title: 'Horário de Rush (minuto mais caótico)',
+            value: '20h57',
+            unit: '10 transações simultâneas',
+            subtitle: 'Transações a cada 15 min na janela oficial (18h15–21h29 · 269 tx)',
+            tooltip: 'Evolução do volume de transações em intervalos de 15 minutos durante toda a janela oficial (18h15 às 21h29), desconsiderando registros após 21h30. O pico ocorre entre 20h45 e 20h59 (52 operações, incluindo o rush de 10 tx às 20h57).',
+            icon: 'flame',
+            tone: 'orange',
+            variant: 'tile',
+            lineSeries: [
+              { label: '18h15', rangeLabel: '18h15 — 18h29', count: 2 },
+              { label: '18h30', rangeLabel: '18h30 — 18h44', count: 4 },
+              { label: '18h45', rangeLabel: '18h45 — 18h59', count: 11 },
+              { label: '19h00', rangeLabel: '19h00 — 19h14', count: 8 },
+              { label: '19h15', rangeLabel: '19h15 — 19h29', count: 18 },
+              { label: '19h30', rangeLabel: '19h30 — 19h44', count: 24 },
+              { label: '19h45', rangeLabel: '19h45 — 19h59', count: 18 },
+              { label: '20h00', rangeLabel: '20h00 — 20h14', count: 8 },
+              { label: '20h15', rangeLabel: '20h15 — 20h29', count: 28 },
+              { label: '20h30', rangeLabel: '20h30 — 20h44', count: 35 },
+              { label: '20h45', rangeLabel: '20h45 — 20h59', count: 52 },
+              { label: '21h00', rangeLabel: '21h00 — 21h14', count: 39 },
+              { label: '21h15', rangeLabel: '21h15 — 21h29', count: 22 }
+            ]
+          },
+          {
+            id: 'marathon',
+            title: 'Maior período',
+            value: '2h e 55min',
+            unit: 'Agência Blend',
+            subtitle: 'Intervalo entre a 1ª e a última operação válida de cada agência',
+            tooltip: 'Diferença de tempo entre a primeira e a última operação válida (até 21h30) da mesma agência, medindo apenas duração — nunca faturamento.',
+            icon: 'timer',
+            tone: 'purple',
+            variant: 'tile',
+            bars: [
+              { agency: 'Blend', numericValue: 175, displayValue: '2h e 55min', detail: '18h26 — 21h21' },
+              { agency: 'Beehive', numericValue: 169, displayValue: '2h e 49min', detail: '18h31 — 21h21' },
+              { agency: 'Memise', numericValue: 158, displayValue: '2h e 38min', detail: '18h39 — 21h18' },
+              { agency: 'Retina', numericValue: 140, displayValue: '2h e 20min', detail: '19h00 — 21h20' },
+              { agency: 'Ethos', numericValue: 93, displayValue: '1h e 33min', detail: '19h55 — 21h29' },
+              { agency: 'ZeniLab', numericValue: 58, displayValue: '0h e 58min', detail: '20h23 — 21h22' }
+            ]
+          }
+        ];
+
+        const FUN_BOTTOM = [
+          {
+            id: 'early-bird',
+            title: 'Primeira transação',
+            value: '18h26',
+            unit: 'Agência Blend',
+            subtitle: 'Quem abriu oficialmente o placar de movimentações',
+            tooltip: 'Primeira agência a registrar uma transferência válida na abertura da feira.',
+            icon: 'sunrise',
+            tone: 'orange',
+            variant: 'tile'
+          },
+          {
+            id: 'night-flight',
+            title: 'Última transação válida',
+            value: '21h29',
+            unit: 'Agência Ethos',
+            subtitle: 'A última transferência dentro do horário oficial',
+            tooltip: 'Última movimentação confirmada antes do encerramento oficial do evento às 21h30.',
+            icon: 'moon',
+            tone: 'purple',
+            variant: 'tile'
+          }
+        ];
+
+        const PATTERNS = [
+          {
+            id: 'volume-champion',
+            title: 'Campeã de Movimentação (Volume)',
+            value: '70 transações',
+            unit: 'Agência Beehive',
+            subtitle: 'Distribuição das 269 operações válidas por agência (maior para menor)',
+            tooltip: 'Quantidade de transações válidas (até 21h30) registradas por cada agência, medindo apenas volume de operações e não faturamento.',
+            icon: 'trendingUp',
+            tone: 'orange',
+            variant: 'tile',
+            bars: [
+              { agency: 'Beehive', numericValue: 70, displayValue: '70 tx', detail: '26,0%' },
+              { agency: 'Blend', numericValue: 68, displayValue: '68 tx', detail: '25,3%' },
+              { agency: 'Memise', numericValue: 46, displayValue: '46 tx', detail: '17,1%' },
+              { agency: 'ZeniLab', numericValue: 44, displayValue: '44 tx', detail: '16,4%' },
+              { agency: 'Retina', numericValue: 24, displayValue: '24 tx', detail: '8,9%' },
+              { agency: 'Ethos', numericValue: 17, displayValue: '17 tx', detail: '6,3%' }
+            ]
+          },
+          {
+            id: 'highest-avg-ticket',
+            title: 'Maior Ticket Médio por Operação',
+            value: '568,11 créditos',
+            unit: 'Agência Memise',
+            subtitle: 'Valor médio por transação válida em cada agência (maior para menor)',
+            tooltip: 'Média de créditos transferidos por operação válida em cada agência, sem exibir ou comparar arrecadação total.',
+            icon: 'award',
+            tone: 'purple',
+            variant: 'tile',
+            bars: [
+              { agency: 'Memise', numericValue: 568.11, displayValue: '568,11', detail: 'créditos' },
+              { agency: 'Blend', numericValue: 515.74, displayValue: '515,74', detail: 'créditos' },
+              { agency: 'ZeniLab', numericValue: 485.57, displayValue: '485,57', detail: 'créditos' },
+              { agency: 'Beehive', numericValue: 467.79, displayValue: '467,79', detail: 'créditos' },
+              { agency: 'Retina', numericValue: 369.46, displayValue: '369,46', detail: 'créditos' },
+              { agency: 'Ethos', numericValue: 223.53, displayValue: '223,53', detail: 'créditos' }
+            ]
+          },
+          {
+            id: 'superfans',
+            title: 'Superfãs',
+            value: '7 casos',
+            unit: 'fidelidade recorrente',
+            subtitle: 'Doaram mais de 1x para a mesma agência',
+            tooltip: 'Superfã é o participante que voltou a investir créditos mais de uma vez na mesma agência ao longo da noite.',
+            icon: 'heart',
+            tone: 'orange',
+            variant: 'tile'
+          },
+          {
+            id: 'butterflies',
+            title: 'Borboletas',
+            value: '6 visitantes',
+            unit: 'exploração ampla',
+            subtitle: 'Interagiram com quase todas as agências',
+            tooltip: 'Visitantes curiosos que circularam pelo evento inteiro e distribuíram apoios por quase todas as agências participantes.',
+            icon: 'sparkles',
+            tone: 'purple',
+            variant: 'tile'
+          }
+        ];
+
+        const MILESTONES = [
+          { targetId: 'early-bird', time: '18h26', title: 'Primeira transação', detail: 'Agência Blend · Abertura do evento', note: 'Marco inicial · Primeira transação às 18h26 pela Agência Blend.' },
+          { targetId: 'rush-hour', time: '20h57', title: 'Horário de Rush', detail: '10 transações simultâneas no mesmo minuto', note: '+2h31 após a abertura · Pico máximo de transações simultâneas.' },
+          { targetId: 'night-flight', time: '21h29', title: 'Última transação válida', detail: 'Agência Ethos · Encerramento no prazo', note: '+32min após o Rush · Última transação válida às 21h29 pela Agência Ethos.' }
+        ];
+
+        function escapeHtml(text) {
+          return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        function renderBars(bars, isPurple, title) {
+          const maxVal = Math.max.apply(null, bars.map(function (b) { return b.numericValue; }).concat([1]));
+          const rowsHtml = bars.map(function (bar, index) {
+            const widthPercent = Math.max(8, Math.round((bar.numericValue / maxVal) * 1000) / 10);
+            const isLeader = index === 0;
+            const fillGradient = isLeader
+              ? 'linear-gradient(90deg, #F27D26 0%, #7C3AED 100%)'
+              : isPurple
+                ? 'linear-gradient(90deg, rgba(124, 58, 237, 0.85) 0%, rgba(124, 58, 237, 0.4) 100%)'
+                : 'linear-gradient(90deg, rgba(242, 125, 38, 0.82) 0%, rgba(242, 125, 38, 0.35) 100%)';
+            const rankStr = String(index + 1).padStart(2, '0');
+            return (
+              '<li>' +
+                '<div class="bar-header">' +
+                  '<div class="bar-label-wrap">' +
+                    '<span class="bar-rank ' + (isLeader ? 'bar-rank-leader' : '') + '">' + rankStr + '</span>' +
+                    '<span class="bar-agency ' + (isLeader ? 'bar-agency-leader' : '') + '">' + escapeHtml(bar.agency) + '</span>' +
+                  '</div>' +
+                  '<div class="bar-val-wrap">' +
+                    '<span class="bar-val ' + (isLeader ? 'bar-val-leader' : '') + '">' + escapeHtml(bar.displayValue) + '</span>' +
+                    (bar.detail ? '<span class="bar-detail">' + escapeHtml(bar.detail) + '</span>' : '') +
+                  '</div>' +
+                '</div>' +
+                '<div class="bar-track" role="progressbar" aria-label="' + escapeHtml(bar.agency + ': ' + bar.displayValue + (bar.detail ? ' (' + bar.detail + ')' : '')) + '" aria-valuenow="' + bar.numericValue + '" aria-valuemin="0" aria-valuemax="' + maxVal + '">' +
+                  '<div class="bar-fill" style="width:' + widthPercent + '%;background:' + fillGradient + ';"></div>' +
+                '</div>' +
+              '</li>'
+            );
+          }).join('');
+          return '<ol class="bar-list" aria-label="Gráfico comparativo de ' + escapeHtml(title) + '">' + rowsHtml + '</ol>';
+        }
+
+        function renderLineChart(series, title, activeIndex) {
+          const SVG_WIDTH = 380;
+          const SVG_HEIGHT = 186;
+          const PAD_LEFT = 28;
+          const PAD_RIGHT = 12;
+          const PAD_TOP = 14;
+          const PAD_BOTTOM = 24;
+          const PLOT_WIDTH = SVG_WIDTH - PAD_LEFT - PAD_RIGHT;
+          const PLOT_HEIGHT = SVG_HEIGHT - PAD_TOP - PAD_BOTTOM;
+          const MAX_Y = 60;
+          const Y_TICKS = [0, 15, 30, 45, 60];
+
+          let peakIndex = 0;
+          for (let i = 1; i < series.length; i++) {
+            if (series[i].count > series[peakIndex].count) peakIndex = i;
+          }
+          const idx = typeof activeIndex === 'number' ? activeIndex : peakIndex;
+          const coords = series.map(function (point, index) {
+            const x = series.length === 1
+              ? PAD_LEFT + PLOT_WIDTH / 2
+              : PAD_LEFT + (index / (series.length - 1)) * PLOT_WIDTH;
+            const y = PAD_TOP + PLOT_HEIGHT - (point.count / MAX_Y) * PLOT_HEIGHT;
+            return { x: x, y: y, point: point };
+          });
+
+          const linePath = coords.map(function (c, i) {
+            return (i === 0 ? 'M' : 'L') + ' ' + c.x.toFixed(1) + ' ' + c.y.toFixed(1);
+          }).join(' ');
+          const baselineY = PAD_TOP + PLOT_HEIGHT;
+          const areaPath = linePath + ' L ' + coords[coords.length - 1].x.toFixed(1) + ' ' + baselineY.toFixed(1) + ' L ' + coords[0].x.toFixed(1) + ' ' + baselineY.toFixed(1) + ' Z';
+          const active = coords[idx] || coords[peakIndex];
+          const isPeak = idx === peakIndex;
+
+          const gridHtml = Y_TICKS.map(function (tick) {
+            const y = PAD_TOP + PLOT_HEIGHT - (tick / MAX_Y) * PLOT_HEIGHT;
+            return (
+              '<line x1="' + PAD_LEFT + '" y1="' + y + '" x2="' + (SVG_WIDTH - PAD_RIGHT) + '" y2="' + y + '" stroke="#251F35" stroke-width="1"' + (tick === 0 ? '' : ' stroke-dasharray="2 3"') + '/>' +
+              '<text x="' + (PAD_LEFT - 6) + '" y="' + (y + 3) + '" text-anchor="end" fill="#9B93B2" font-size="9.5" font-family="JetBrains Mono, ui-monospace, monospace">' + tick + '</text>'
+            );
+          }).join('');
+
+          const pointsHtml = coords.map(function (c, index) {
+            const showXLabel = index % 3 === 0;
+            const isCurrent = index === idx;
+            const isPointPeak = index === peakIndex;
+            const anchor = index === 0 ? 'start' : index === coords.length - 1 ? 'end' : 'middle';
+            return (
+              (showXLabel ? '<text x="' + c.x + '" y="' + (SVG_HEIGHT - 6) + '" text-anchor="' + anchor + '" fill="' + (isCurrent ? '#FFFFFF' : '#9B93B2') + '" font-size="9.5" font-weight="' + (isCurrent ? '700' : '400') + '" font-family="JetBrains Mono, ui-monospace, monospace">' + escapeHtml(c.point.label) + '</text>' : '') +
+              (isCurrent ? '<circle cx="' + c.x + '" cy="' + c.y + '" r="7" fill="rgba(242, 125, 38, 0.22)"/>' : '') +
+              '<circle cx="' + c.x + '" cy="' + c.y + '" r="' + (isCurrent ? '4.2' : isPointPeak ? '3.5' : '2.4') + '" fill="' + (isCurrent || isPointPeak ? '#F27D26' : '#161126') + '" stroke="' + (isCurrent ? '#FFFFFF' : isPointPeak ? '#F27D26' : '#9B93B2') + '" stroke-width="' + (isCurrent ? '1.8' : '1.5') + '"/>' +
+              '<circle cx="' + c.x + '" cy="' + c.y + '" r="13" fill="transparent" class="line-hit" tabindex="0" role="button" data-line-index="' + index + '" aria-label="' + escapeHtml(c.point.rangeLabel + ': ' + c.point.count + ' transações') + '"/>'
+            );
+          }).join('');
+
+          return (
+            '<div class="line-chart-wrap" data-peak-index="' + peakIndex + '">' +
+              '<div class="line-readout">' +
+                '<div>' +
+                  '<span class="line-readout-range">' + escapeHtml(active.point.rangeLabel) + '</span>' +
+                  (isPeak ? '<span class="line-readout-peak">· Pico (Rush 20h57)</span>' : '') +
+                '</div>' +
+                '<span class="line-readout-count">' + active.point.count + ' ' + (active.point.count === 1 ? 'operação' : 'operações') + '</span>' +
+              '</div>' +
+              '<svg viewBox="0 0 ' + SVG_WIDTH + ' ' + SVG_HEIGHT + '" role="img" aria-label="Gráfico de linha de ' + escapeHtml(title) + ': quantidade de transações por blocos de 15 minutos das 18h15 às 21h30" class="line-svg">' +
+                '<defs>' +
+                  '<linearGradient id="expoLineAreaGrad" x1="0" y1="0" x2="0" y2="1">' +
+                    '<stop offset="0%" stop-color="#F27D26" stop-opacity="0.34"/>' +
+                    '<stop offset="65%" stop-color="#7C3AED" stop-opacity="0.12"/>' +
+                    '<stop offset="100%" stop-color="#0F0A1F" stop-opacity="0"/>' +
+                  '</linearGradient>' +
+                  '<linearGradient id="expoLineStrokeGrad" x1="0" y1="0" x2="1" y2="0">' +
+                    '<stop offset="0%" stop-color="#7C3AED"/>' +
+                    '<stop offset="72%" stop-color="#F27D26"/>' +
+                    '<stop offset="100%" stop-color="#FF9142"/>' +
+                  '</linearGradient>' +
+                '</defs>' +
+                gridHtml +
+                '<path d="' + areaPath + '" fill="url(#expoLineAreaGrad)"/>' +
+                '<line x1="' + active.x + '" y1="' + PAD_TOP + '" x2="' + active.x + '" y2="' + baselineY + '" stroke="rgba(242, 125, 38, 0.45)" stroke-width="1" stroke-dasharray="3 3"/>' +
+                '<path d="' + linePath + '" fill="none" stroke="url(#expoLineStrokeGrad)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+                pointsHtml +
+              '</svg>' +
+            '</div>'
+          );
+        }
+
+        function renderCard(item) {
+          const isKpi = item.variant === 'kpi';
+          const isPurple = item.tone === 'purple';
+          const tooltipId = 'tooltip-' + item.id;
+          const bodyHtml = item.lineSeries && item.lineSeries.length
+            ? renderLineChart(item.lineSeries, item.title)
+            : item.bars && item.bars.length
+              ? renderBars(item.bars, isPurple, item.title)
+              : (
+                '<div class="' + (isKpi ? 'card-value-row' : 'card-value-col') + '">' +
+                  '<p class="card-value ' + (isKpi ? 'card-value-kpi' : 'card-value-tile') + '">' + escapeHtml(item.value) + '</p>' +
+                  '<span class="card-unit">' + escapeHtml(item.unit) + '</span>' +
+                '</div>'
+              );
+          return (
+            '<article class="card ' + (isKpi ? 'card-kpi ' : '') + (isPurple ? 'card-purple' : '') + '" data-metric-id="' + item.id + '">' +
+              '<div>' +
+                '<div class="card-top">' +
+                  '<div class="card-title-wrap">' +
+                    '<span class="icon-box" aria-hidden="true">' +
+                      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                        ICONS[item.icon] +
+                      '</svg>' +
+                    '</span>' +
+                    '<h3 class="card-title">' + escapeHtml(item.title) + '</h3>' +
+                  '</div>' +
+                  '<div class="tooltip-wrap">' +
+                    '<button type="button" class="tooltip-btn" aria-label="Explicar métrica: ' + escapeHtml(item.title) + '" aria-expanded="false" data-tooltip-target="' + tooltipId + '">' +
+                      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                        '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>' +
+                      '</svg>' +
+                    '</button>' +
+                    '<div id="' + tooltipId + '" role="tooltip" class="tooltip-popover" data-open="false">' +
+                      '<p class="tooltip-kicker">Como funciona</p>' +
+                      '<p class="tooltip-body">' + escapeHtml(item.tooltip) + '</p>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+                bodyHtml +
+              '</div>' +
+              '<p class="card-sub">' + escapeHtml(item.subtitle) + '</p>' +
+            '</article>'
+          );
+        }
+
+        let selectedTimelineId = null;
+
+        function renderTimeline() {
+          const desktopItems = MILESTONES.map(function (m) {
+            const selected = selectedTimelineId === m.targetId;
+            return (
+              '<li>' +
+                '<button type="button" class="timeline-node-btn" data-target-metric="' + m.targetId + '" aria-pressed="' + (selected ? 'true' : 'false') + '">' +
+                  '<span aria-hidden="true" class="timeline-dot"></span>' +
+                  '<span class="timeline-time">' + escapeHtml(m.time) + '</span>' +
+                  '<span class="timeline-label">' + escapeHtml(m.title) + '</span>' +
+                  '<span class="timeline-sub">' + escapeHtml(m.detail) + '</span>' +
+                '</button>' +
+              '</li>'
+            );
+          }).join('');
+
+          const mobileItems = MILESTONES.map(function (m) {
+            const selected = selectedTimelineId === m.targetId;
+            return (
+              '<li>' +
+                '<button type="button" class="timeline-mobile-btn" data-target-metric="' + m.targetId + '" aria-pressed="' + (selected ? 'true' : 'false') + '">' +
+                  '<span class="timeline-time" style="flex-shrink:0;padding-top:2px;">' + escapeHtml(m.time) + '</span>' +
+                  '<div>' +
+                    '<p class="timeline-label" style="margin-top:0;">' + escapeHtml(m.title) + '</p>' +
+                    '<p class="timeline-sub">' + escapeHtml(m.detail) + '</p>' +
+                  '</div>' +
+                '</button>' +
+              '</li>'
+            );
+          }).join('');
+
+          const active = MILESTONES.find(function (m) { return m.targetId === selectedTimelineId; });
+
+          return (
+            '<div class="timeline-head">' +
+              '<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;">' +
+                '<p class="card-unit" style="margin:0;">Linha do tempo da noite</p>' +
+                '<span class="section-hint">Selecione um marco para destacar o evento</span>' +
+              '</div>' +
+              '<span class="timeline-time" style="color:#C4BBD9;font-weight:400;">18h26 — 21h29</span>' +
+            '</div>' +
+            '<div class="timeline-desktop-wrap">' +
+              '<div class="timeline-track" aria-hidden="true"><div class="timeline-fill"></div></div>' +
+              '<ol class="timeline-grid">' + desktopItems + '</ol>' +
+            '</div>' +
+            '<ol class="timeline-mobile">' + mobileItems + '</ol>' +
+            (active ? '<p class="timeline-note"><span class="timeline-time" style="margin-right:8px;">' + escapeHtml(active.time) + '</span>' + escapeHtml(active.note) + '</p>' : '')
+          );
+        }
+
+        function bindTimelineEvents() {
+          document.querySelectorAll('#timeline-card [data-target-metric]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              const targetId = btn.getAttribute('data-target-metric');
+              selectedTimelineId = selectedTimelineId === targetId ? null : targetId;
+              document.getElementById('timeline-card').innerHTML = renderTimeline();
+              bindTimelineEvents();
+              document.querySelectorAll('[data-metric-id]').forEach(function (card) {
+                card.classList.toggle('card-selected', card.getAttribute('data-metric-id') === selectedTimelineId);
+              });
+            });
+          });
+        }
+
+        function bindLineChartEvents() {
+          const rushItem = FUN_TOP.find(function (m) { return m.id === 'rush-hour'; });
+          if (!rushItem || !rushItem.lineSeries) return;
+          const cardEl = document.querySelector('[data-metric-id="rush-hour"]');
+          if (!cardEl) return;
+          const wrap = cardEl.querySelector('.line-chart-wrap');
+          if (!wrap) return;
+          const peakIdx = Number(wrap.getAttribute('data-peak-index') || 0);
+
+          function updateChart(idx) {
+            wrap.outerHTML = renderLineChart(rushItem.lineSeries, rushItem.title, idx);
+            bindLineChartEvents();
+          }
+
+          wrap.addEventListener('mouseleave', function () {
+            updateChart(peakIdx);
+          });
+
+          wrap.querySelectorAll('.line-hit').forEach(function (hit) {
+            const idx = Number(hit.getAttribute('data-line-index'));
+            hit.addEventListener('mouseenter', function () { updateChart(idx); });
+            hit.addEventListener('focus', function () { updateChart(idx); });
+            hit.addEventListener('click', function () { updateChart(idx); });
+          });
+        }
+
+        document.getElementById('grid-big-numbers').innerHTML = BIG_NUMBERS.map(renderCard).join('');
+        document.getElementById('timeline-card').innerHTML = renderTimeline();
+        bindTimelineEvents();
+        document.getElementById('grid-fun-top').innerHTML = FUN_TOP.map(renderCard).join('');
+        bindLineChartEvents();
+        document.getElementById('grid-fun-bottom').innerHTML = FUN_BOTTOM.map(renderCard).join('');
+        document.getElementById('grid-patterns').innerHTML = PATTERNS.map(renderCard).join('');
+
+        document.querySelectorAll('.sidebar-link').forEach(function (link) {
+          link.addEventListener('click', function () {
+            document.querySelectorAll('.sidebar-link').forEach(function (other) {
+              other.setAttribute('data-active', 'false');
+            });
+            link.setAttribute('data-active', 'true');
+          });
+        });
+
+        let pinnedBtn = null;
+
+        function setTooltipState(btn, open) {
+          const popover = document.getElementById(btn.getAttribute('data-tooltip-target'));
+          if (!popover) return;
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          popover.setAttribute('data-open', open ? 'true' : 'false');
+          if (open) {
+            btn.setAttribute('aria-describedby', popover.id);
+          } else {
+            btn.removeAttribute('aria-describedby');
+          }
+        }
+
+        function closeAllTooltips() {
+          document.querySelectorAll('.tooltip-btn').forEach(function (b) {
+            setTooltipState(b, false);
+          });
+          pinnedBtn = null;
+        }
+
+        document.querySelectorAll('.tooltip-wrap').forEach(function (wrap) {
+          const btn = wrap.querySelector('.tooltip-btn');
+          wrap.addEventListener('mouseenter', function () {
+            setTooltipState(btn, true);
+          });
+          wrap.addEventListener('mouseleave', function () {
+            if (pinnedBtn !== btn) setTooltipState(btn, false);
+          });
+          btn.addEventListener('focus', function () {
+            setTooltipState(btn, true);
+          });
+          btn.addEventListener('blur', function () {
+            if (pinnedBtn !== btn) setTooltipState(btn, false);
+          });
+          btn.addEventListener('click', function (event) {
+            event.stopPropagation();
+            const isSame = pinnedBtn === btn;
+            closeAllTooltips();
+            if (!isSame) {
+              pinnedBtn = btn;
+              setTooltipState(btn, true);
+            }
+          });
+        });
+
+        document.addEventListener('pointerdown', function (event) {
+          if (!event.target.closest('.tooltip-wrap')) {
+            closeAllTooltips();
+          }
+        });
+
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') {
+            closeAllTooltips();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

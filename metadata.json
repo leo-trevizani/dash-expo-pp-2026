@@ -1,0 +1,6 @@
+{
+  "name": "Expo PP — Resultados do Evento",
+  "description": "Dashboard de resultados e destaques comportamentais da Expo PP para os alunos participantes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

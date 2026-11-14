@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --expo-canvas: #0F0A1F;
+    --expo-sidebar: #130E26;
+    --expo-surface: #161126;
+    --expo-surface-raised: #221E30;
+    --expo-primary: #F27D26;
+    --expo-primary-hover: #FF9142;
+    --expo-purple: #7C3AED;
+    --expo-hairline: #251F35;
+    --expo-text: #FFFFFF;
+    --expo-text-secondary: #D4CEE3;
+    --expo-text-muted: #9B93B2;
+    --expo-shadow-sm: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+    --expo-shadow-md: oklab(0.710617 0.106104 0.132957 / 0.2) 0px 10px 15px -3px, oklab(0.710617 0.106104 0.132957 / 0.2) 0px 4px 6px -4px;
+    --expo-shadow-lg: oklab(0.710617 0.106104 0.132957 / 0.1) 0px 20px 25px -5px, oklab(0.710617 0.106104 0.132957 / 0.1) 0px 8px 10px -6px;
+  }
+
+  html {
+    background-color: var(--expo-canvas);
+    color: var(--expo-text);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--expo-canvas);
+    color: var(--expo-text);
+    overflow-x: hidden;
+  }
+}
+
+.font-display {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.font-sans-body {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.font-mono-tech {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.expo-display-heading {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.expo-dashboard-banner {
+  background:
+    radial-gradient(50% 90% at 8% 0%, oklab(0.710617 0.106104 0.132957 / 0.14) 0%, transparent 70%),
+    radial-gradient(45% 80% at 92% 10%, rgba(124, 58, 237, 0.16) 0%, transparent 70%),
+    linear-gradient(
+      to right,
+      oklab(0.381 0.100917 -0.144194 / 0.25) 0%,
+      rgba(22, 18, 33, 0.75) 55%,
+      oklab(0.266 0.0637018 0.0467235 / 0.22) 100%
+    );
+}
+
+.expo-gradient-text {
+  background: linear-gradient(
+    to right,
+    rgb(255, 255, 255) 0%,
+    oklch(0.968 0.007 247.896) 50%,
+    rgb(242, 125, 38) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.expo-gradient-accent {
+  background: linear-gradient(
+    to right top in oklab,
+    rgb(242, 125, 38) 0%,
+    rgb(124, 58, 237) 100%
+  );
+}
+
+.expo-card {
+  background: linear-gradient(180deg, rgba(34, 30, 48, 0.52) 0%, rgba(15, 10, 30, 0.92) 100%);
+  border: 1px solid var(--expo-hairline);
+  box-shadow: var(--expo-shadow-sm);
+  transition:
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expo-card:hover,
+.expo-card:focus-within {
+  z-index: 20;
+  transform: translateY(-2px);
+  border-color: rgba(242, 125, 38, 0.44);
+  box-shadow: var(--expo-shadow-md), 0 0 0 1px rgba(124, 58, 237, 0.25);
+}
+
+.expo-card-purple:hover,
+.expo-card-purple:focus-within {
+  border-color: rgba(124, 58, 237, 0.48);
+  box-shadow: var(--expo-shadow-lg), 0 0 0 1px rgba(242, 125, 38, 0.22);
+}
+
+.expo-card-selected {
+  border-color: rgba(242, 125, 38, 0.72);
+  box-shadow: 0 0 0 1px rgba(242, 125, 38, 0.42), var(--expo-shadow-md);
+}
+
+.expo-btn-outline {
+  color: oklch(0.704 0.04 256.788);
+  border: 1px solid oklab(0.257013 0.0180493 -0.0371398 / 0.45);
+  border-radius: 8px;
+  transition:
+    border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expo-btn-outline:hover {
+  color: #FFFFFF;
+  border-color: rgba(242, 125, 38, 0.5);
+  background-color: rgba(242, 125, 38, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .expo-card {
+    transition: none;
+  }
+
+  .expo-card:hover,
+  .expo-card:focus-within {
+    transform: none;
+  }
+}
