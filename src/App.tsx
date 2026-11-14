@@ -28,9 +28,9 @@ const NAV_ITEMS: readonly {
   icon: typeof LayoutDashboard;
 }[] = [
   { id: 'visao-geral', label: 'Visão Geral', icon: LayoutDashboard },
-  { id: 'big-numbers', label: 'Big Numbers', icon: BarChart3 },
-  { id: 'numeros-divertidos', label: 'Números Divertidos', icon: Clock },
-  { id: 'padroes', label: 'Padrões dos Participantes', icon: Users },
+  { id: 'big-numbers', label: 'Principais métricas', icon: BarChart3 },
+  { id: 'numeros-divertidos', label: 'Performance', icon: Clock },
+  { id: 'padroes', label: 'Comportamento', icon: Users },
 ];
 
 const POST_EVENT_FORM_URL = 'https://forms.gle/UCGH6Pug6AW7fHS66';
@@ -164,10 +164,10 @@ export default function App() {
                 </div>
               </section>
 
-              {/* Section 01: Top KPI Strip (Big Numbers) */}
+              {/* Section 01: Principais métricas */}
               <section
                 id="big-numbers"
-                aria-label="Big Numbers"
+                aria-label="Principais métricas"
                 className="scroll-mt-20"
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -181,67 +181,79 @@ export default function App() {
                 </div>
               </section>
 
-              {/* Main 12-Column Dashboard Bento Workspace */}
-              <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
-                {/* Left 8 Columns: Números Divertidos + Timeline */}
-                <section
-                  id="numeros-divertidos"
-                  aria-label="Números Divertidos"
-                  className="scroll-mt-20 flex flex-col gap-4 xl:col-span-8"
-                >
-                  <EventTimeline
-                    selectedMetricId={selectedTimelineMetricId}
-                    onSelectMetric={handleSelectTimelineMetric}
-                  />
+              {/* Section 02: Performance (Timeline + 6 cards) */}
+              <section
+                id="numeros-divertidos"
+                aria-label="Performance"
+                className="scroll-mt-20 flex flex-col gap-4"
+              >
+                <EventTimeline
+                  selectedMetricId={selectedTimelineMetricId}
+                  onSelectMetric={handleSelectTimelineMetric}
+                />
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {FUN_NUMBERS.slice(0, 2).map((metric) => (
-                      <MetricCard
-                        key={metric.id}
-                        metric={metric}
-                        variant="tile"
-                        className={
-                          selectedTimelineMetricId === metric.id
-                            ? 'expo-card-selected'
-                            : ''
-                        }
-                      />
-                    ))}
-                  </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {FUN_NUMBERS.slice(0, 2).map((metric) => (
+                    <MetricCard
+                      key={metric.id}
+                      metric={metric}
+                      variant="tile"
+                      className={
+                        selectedTimelineMetricId === metric.id
+                          ? 'expo-card-selected'
+                          : ''
+                      }
+                    />
+                  ))}
+                </div>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {FUN_NUMBERS.slice(2).map((metric) => (
-                      <MetricCard
-                        key={metric.id}
-                        metric={metric}
-                        variant="tile"
-                        className={
-                          selectedTimelineMetricId === metric.id
-                            ? 'expo-card-selected'
-                            : ''
-                        }
-                      />
-                    ))}
-                  </div>
-                </section>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {FUN_NUMBERS.slice(2, 4).map((metric) => (
+                    <MetricCard
+                      key={metric.id}
+                      metric={metric}
+                      variant="tile"
+                      className={
+                        selectedTimelineMetricId === metric.id
+                          ? 'expo-card-selected'
+                          : ''
+                      }
+                    />
+                  ))}
+                </div>
 
-                {/* Right 4 Columns: Padrões dos Participantes */}
-                <section
-                  id="padroes"
-                  aria-label="Padrões dos Participantes"
-                  className="scroll-mt-20 flex flex-col gap-4 xl:col-span-4"
-                >
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-1 xl:flex-1">
-                    {PARTICIPANT_PATTERNS.map((metric) => (
-                      <MetricCard
-                        key={metric.id}
-                        metric={metric}
-                        variant="row"
-                      />
-                    ))}
-                  </div>
-                </section>
-              </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {FUN_NUMBERS.slice(4).map((metric) => (
+                    <MetricCard
+                      key={metric.id}
+                      metric={metric}
+                      variant="tile"
+                      className={
+                        selectedTimelineMetricId === metric.id
+                          ? 'expo-card-selected'
+                          : ''
+                      }
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* Section 03: Comportamento (Superfãs e Borboletas) */}
+              <section
+                id="padroes"
+                aria-label="Comportamento"
+                className="scroll-mt-20"
+              >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {PARTICIPANT_PATTERNS.map((metric) => (
+                    <MetricCard
+                      key={metric.id}
+                      metric={metric}
+                      variant="tile"
+                    />
+                  ))}
+                </div>
+              </section>
             </div>
           </main>
 

@@ -222,12 +222,9 @@ export const FUN_NUMBERS: readonly MetricItem[] = [
     emphasis: 'standard',
     accentTone: 'purple',
   },
-];
-
-export const PARTICIPANT_PATTERNS: readonly MetricItem[] = [
   {
     id: 'volume-champion',
-    section: 'participant-patterns',
+    section: 'fun-numbers',
     title: 'Campeã de Movimentação (Volume)',
     value: '70 transações',
     unit: 'Agência Beehive',
@@ -248,7 +245,7 @@ export const PARTICIPANT_PATTERNS: readonly MetricItem[] = [
   },
   {
     id: 'highest-avg-ticket',
-    section: 'participant-patterns',
+    section: 'fun-numbers',
     title: 'Maior Ticket Médio por Operação',
     value: '568,11 créditos',
     unit: 'Agência Memise',
@@ -267,6 +264,9 @@ export const PARTICIPANT_PATTERNS: readonly MetricItem[] = [
       { agency: 'Ethos', numericValue: 223.53, displayValue: '223,53', detail: 'créditos' },
     ],
   },
+];
+
+export const PARTICIPANT_PATTERNS: readonly MetricItem[] = [
   {
     id: 'superfans',
     section: 'participant-patterns',

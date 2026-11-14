@@ -475,37 +475,10 @@
         }
       }
 
-      .bento-12 {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      @media (min-width: 1280px) {
-        .bento-12 {
-          grid-template-columns: repeat(12, minmax(0, 1fr));
-        }
-      }
-
-      .bento-left {
+      .section-stack {
         display: flex;
         flex-direction: column;
         gap: 16px;
-      }
-
-      .bento-right {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      @media (min-width: 1280px) {
-        .bento-left {
-          grid-column: span 8 / span 8;
-        }
-        .bento-right {
-          grid-column: span 4 / span 4;
-        }
       }
 
       .grid-2 {
@@ -517,37 +490,6 @@
       @media (min-width: 640px) {
         .grid-2 {
           grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      .grid-3 {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      @media (min-width: 640px) {
-        .grid-3 {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      .grid-patterns {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      @media (min-width: 768px) {
-        .grid-patterns {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      @media (min-width: 1280px) {
-        .grid-patterns {
-          grid-template-columns: 1fr;
-          flex: 1;
         }
       }
 
@@ -1153,15 +1095,15 @@
               </a>
               <a href="#big-numbers" class="sidebar-link" data-nav="big-numbers" data-active="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                <span>Big Numbers</span>
+                <span>Principais métricas</span>
               </a>
               <a href="#numeros-divertidos" class="sidebar-link" data-nav="numeros-divertidos" data-active="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <span>Números Divertidos</span>
+                <span>Performance</span>
               </a>
               <a href="#padroes" class="sidebar-link" data-nav="padroes" data-active="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span>Padrões dos Participantes</span>
+                <span>Comportamento</span>
               </a>
             </nav>
           </div>
@@ -1198,21 +1140,20 @@
               </div>
             </section>
 
-            <section id="big-numbers" class="section-anchor" aria-label="Big Numbers">
+            <section id="big-numbers" class="section-anchor" aria-label="Principais métricas">
               <div id="grid-big-numbers" class="grid-kpi"></div>
             </section>
 
-            <div class="bento-12">
-              <section id="numeros-divertidos" class="section-anchor bento-left" aria-label="Números Divertidos">
-                <div id="timeline-card" class="card card-kpi" aria-label="Linha do tempo cronológica dos principais marcos do evento"></div>
-                <div id="grid-fun-top" class="grid-2"></div>
-                <div id="grid-fun-bottom" class="grid-3"></div>
-              </section>
+            <section id="numeros-divertidos" class="section-anchor section-stack" aria-label="Performance">
+              <div id="timeline-card" class="card card-kpi" aria-label="Linha do tempo cronológica dos principais marcos do evento"></div>
+              <div id="grid-fun-top" class="grid-2"></div>
+              <div id="grid-fun-bottom" class="grid-2"></div>
+              <div id="grid-fun-bars" class="grid-2"></div>
+            </section>
 
-              <section id="padroes" class="section-anchor bento-right" aria-label="Padrões dos Participantes">
-                <div id="grid-patterns" class="grid-patterns"></div>
-              </section>
-            </div>
+            <section id="padroes" class="section-anchor" aria-label="Comportamento">
+              <div id="grid-patterns" class="grid-2"></div>
+            </section>
           </div>
         </main>
 
@@ -1395,7 +1336,7 @@
           }
         ];
 
-        const PATTERNS = [
+        const FUN_BARS = [
           {
             id: 'volume-champion',
             title: 'Campeã de Movimentação (Volume)',
@@ -1433,7 +1374,10 @@
               { agency: 'Retina', numericValue: 369.46, displayValue: '369,46', detail: 'créditos' },
               { agency: 'Ethos', numericValue: 223.53, displayValue: '223,53', detail: 'créditos' }
             ]
-          },
+          }
+        ];
+
+        const PATTERNS = [
           {
             id: 'superfans',
             title: 'Superfãs',
@@ -1732,6 +1676,7 @@
         document.getElementById('grid-fun-top').innerHTML = FUN_TOP.map(renderCard).join('');
         bindLineChartEvents();
         document.getElementById('grid-fun-bottom').innerHTML = FUN_BOTTOM.map(renderCard).join('');
+        document.getElementById('grid-fun-bars').innerHTML = FUN_BARS.map(renderCard).join('');
         document.getElementById('grid-patterns').innerHTML = PATTERNS.map(renderCard).join('');
 
         document.querySelectorAll('.sidebar-link').forEach(function (link) {

@@ -13,10 +13,22 @@ import {
 
 test('contains exact 3 sections and 14 metrics', () => {
   assert.equal(BIG_NUMBERS.length, 6);
-  assert.equal(FUN_NUMBERS.length, 4);
-  assert.equal(PARTICIPANT_PATTERNS.length, 4);
+  assert.equal(FUN_NUMBERS.length, 6);
+  assert.equal(PARTICIPANT_PATTERNS.length, 2);
   assert.equal(ALL_METRICS.length, 14);
   assert.equal(EVENT_TIMELINE_MILESTONES.length, 3);
+  assert.deepEqual(
+    PARTICIPANT_PATTERNS.map((m) => m.id),
+    ['superfans', 'butterflies'],
+  );
+  assert.equal(
+    FUN_NUMBERS.some((m) => m.id === 'volume-champion'),
+    true,
+  );
+  assert.equal(
+    FUN_NUMBERS.some((m) => m.id === 'highest-avg-ticket'),
+    true,
+  );
 });
 
 test('all requested values are present without post-21h30 transactions', () => {
